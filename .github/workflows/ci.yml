@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e ".[dev,raft]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: pytest
+      - name: The lease bug is found, and the fix holds
+        run: |
+          oneseed search lease --seeds 200 && exit 1 || true
+          oneseed search lease-fixed --seeds 200
+      - name: Raft as written survives 300 seeds
+        run: oneseed search raft --seeds 300

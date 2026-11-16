@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "oneseed"
+version = "0.1.0"
+description = "Deterministic simulation testing: one seed replays an entire failure, faults included."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Krish Saxena" }]
+keywords = ["distributed-systems", "testing", "simulation", "determinism"]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+# Only the Raft scenarios need this. The simulator itself imports nothing.
+raft = ["raftlab @ git+https://github.com/KRISH123no/raftlab.git"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[project.scripts]
+oneseed = "oneseed.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["oneseed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
